@@ -4,7 +4,7 @@ import posed from 'react-pose';
 
 const containerProps = {
   visible: { x: 0, delayChildren: 500, staggerChildren: 400 },
-  hidden: { x: '-200%' },
+  hidden: { x: '200%', delay: 1000 },
 };
 const boxProps = {
   visible: {
@@ -13,13 +13,13 @@ const boxProps = {
     transition: {
       opacity: {
         type: 'keyframes',
-        duration: 700,
+        duration: 400,
         values: [0, 0.7, 0.3, 1],
       },
       y: {
         type: 'spring',
         stiffness: 700,
-        damping: 15,
+        damping: 10,
       },
     },
   },
@@ -38,11 +38,33 @@ const StyledBox = styled(Box)`
   margin: 2rem;
 `;
 
+const PageWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const Nav = styled.nav`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 6rem;
+  background-color: #263238;
+`;
+
+const Button = styled.button`
+  background: #cfd8dc;
+  color: black;
+  padding: 1rem 2rem;
+  font-size: 1.5rem;
+  margin-right: 1.5rem;
+  text-transform: uppercase;
+`;
+
 const StyledContainer = styled(Container)`
   display: flex;
   justify-content: center;
   width: 60rem;
-  height: 50rem;
+  height: 45rem;
   margin: 5rem auto;
   background: #58616a;
   flex-wrap: wrap;
@@ -71,10 +93,14 @@ class App extends Component {
   }
 
   render() {
+    const Toggles = ['Animation 1', 'Animation 2', 'Animation 3'];
     return (
-      <StyledContainer pose={this.state.isVisible ? 'visible' : 'hidden'}>
-        {[...Array(12)].map((e, i) => <StyledBox key={`box${i + 1}`} />)}
-      </StyledContainer>
+      <PageWrapper>
+        <Nav>{Toggles.map(toggle => <Button onClick={this.animateBoxes}>{toggle}</Button>)}</Nav>
+        <StyledContainer pose={this.state.isVisible ? 'visible' : 'hidden'}>
+          {[...Array(12)].map((e, i) => <StyledBox key={`box${i + 1}`} />)}
+        </StyledContainer>
+      </PageWrapper>
     );
   }
 }
