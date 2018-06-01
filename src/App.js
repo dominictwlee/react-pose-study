@@ -3,12 +3,27 @@ import styled from 'styled-components';
 import posed from 'react-pose';
 
 const containerProps = {
-  visible: { x: 0, delayChildren: 1000, staggerChildren: 200 },
+  visible: { x: 0, delayChildren: 500, staggerChildren: 400 },
   hidden: { x: '-200%' },
 };
 const boxProps = {
-  visible: { opacity: 1, y: 0 },
-  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      opacity: {
+        type: 'keyframes',
+        duration: 700,
+        values: [0, 0.7, 0.3, 1],
+      },
+      y: {
+        type: 'spring',
+        stiffness: 700,
+        damping: 15,
+      },
+    },
+  },
+  hidden: { opacity: 0, y: 40 },
 };
 
 const Container = posed.div(containerProps);
