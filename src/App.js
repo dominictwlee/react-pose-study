@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import posed from 'react-pose';
 
 const containerProps = {
-  visible: { x: 0, delayChildren: 500, staggerChildren: 400 },
-  hidden: { x: '200%', delay: 1000 },
+  visible: { x: 0, delayChildren: 300, staggerChildren: 50, staggerDirection: -1 },
+  hidden: { x: '200%', delay: 1100 },
 };
 const boxProps = {
   visible: {
@@ -12,9 +12,8 @@ const boxProps = {
     y: 0,
     transition: {
       opacity: {
-        type: 'keyframes',
-        duration: 400,
-        values: [0, 0.7, 0.3, 1],
+        type: 'tween',
+        delay: 1000,
       },
       y: {
         type: 'spring',
@@ -23,7 +22,17 @@ const boxProps = {
       },
     },
   },
-  hidden: { opacity: 0, y: 40 },
+  hidden: {
+    opacity: 0,
+    y: 50,
+    transition: {
+      opacity: {
+        type: 'keyframes',
+        values: [0, 0.3, 0.9, 0.3, 0],
+        duration: 1000,
+      },
+    },
+  },
 };
 
 const Container = posed.div(containerProps);
@@ -96,7 +105,13 @@ class App extends Component {
     const Toggles = ['Animation 1', 'Animation 2', 'Animation 3'];
     return (
       <PageWrapper>
-        <Nav>{Toggles.map(toggle => <Button onClick={this.animateBoxes}>{toggle}</Button>)}</Nav>
+        <Nav>
+          {Toggles.map(toggle => (
+            <Button key={toggle} onClick={this.animateBoxes}>
+              {toggle}
+            </Button>
+          ))}
+        </Nav>
         <StyledContainer pose={this.state.isVisible ? 'visible' : 'hidden'}>
           {[...Array(12)].map((e, i) => <StyledBox key={`box${i + 1}`} />)}
         </StyledContainer>
