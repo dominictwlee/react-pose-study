@@ -1,25 +1,31 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import posed, { PoseGroup } from 'react-pose';
-import { tween } from 'popmotion';
 
 const shuffle = array => {
   var currentIndex = array.length,
     temporaryValue,
     randomIndex;
 
-  // While there remain elements to shuffle...
   while (0 !== currentIndex) {
-    // Pick a remaining element...
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex -= 1;
 
-    // And swap it with the current element.
     temporaryValue = array[currentIndex];
     array[currentIndex] = array[randomIndex];
     array[randomIndex] = temporaryValue;
   }
   return array;
+};
+
+const generateRandomNum = maxNum => Math.floor(Math.random() * Math.floor(maxNum));
+
+const randomiseColor = () => {
+  const red = generateRandomNum(256);
+  const green = generateRandomNum(256);
+  const blue = generateRandomNum(256);
+
+  return `rgb(${red}, ${green}, ${blue})`;
 };
 
 //  Group 1: Animate Children
@@ -78,25 +84,31 @@ const StyledContainer = styled(Container)`
   flex-wrap: wrap;
 `;
 
-//  PosedGroup FLIP
+//  2. PosedGroup FLIP
 const Item = posed.div({
-  // flip: {
-  //   transition: tween,
-  // },
+  enter: { opacity: 1 },
+  exit: { opacity: 0 },
 });
 
 const StyledItem = styled(Item)`
-  width: ${props => props.width};
-  height: ${props => props.height};
+  flex: 1 1 5rem;
+  font-size: 2rem;
+  font-weight: bold;
+  min-width: 4rem;
+  min-height: ${props => props.height};
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background: ${props => (props.color ? props.color : '#fafafa')};
   box-shadow: 1px 1px 3px black;
   margin: 2rem;
 `;
 
 const ListContainer = StyledContainer.extend`
-  min-width: 40rem;
-  width: 20rem;
   margin-bottom: 1rem;
+  max-height: 40rem;
+  /* min-width: 90%; */
+  flex-direction: column;
 `;
 
 //  General Page Layout Components
@@ -129,35 +141,49 @@ const Button = styled.button`
 class App extends Component {
   constructor(props) {
     super(props);
+
+    this.resetItemsState = () => [
+      {
+        num: 0,
+        color: randomiseColor(),
+      },
+    ];
+
     this.state = {
+      animateChildren: false,
       poseGroup: false,
       isVisible: false,
-      items: [0, 1],
-    };
-
-    this.animateBoxes = () => {
-      this.setState({
-        isVisible: !this.state.isVisible,
-      });
+      items: this.resetItemsState(),
     };
 
     this.shuffleBoxes = () => {
       this.setState({ items: shuffle(this.state.items) });
     };
 
-    this.show = () => {
-      this.setState({
-        isVisible: !this.state.isVisible,
+    this.animateBoxes = () => {
+      this.setState({ animateChildren: true }, () => {
+        this.setState({ isVisible: !this.state.isVisible });
       });
     };
 
     this.showPoseGroup = () => {
-      this.setState({ poseGroup: !this.state.poseGroup });
+      this.setState({
+        poseGroup: !this.state.poseGroup,
+        items: this.resetItemsState(),
+      });
     };
 
     this.addItemToList = () => {
       const newItem = this.state.items.length;
-      this.setState(prevState => ({ items: [newItem, ...prevState.items] }));
+      this.setState(prevState => ({
+        items: [
+          {
+            num: newItem,
+            color: randomiseColor(),
+          },
+          ...prevState.items,
+        ],
+      }));
     };
   }
 
@@ -173,7 +199,11 @@ class App extends Component {
             <ListContainer>
               <PoseGroup>
                 {this.state.items.map(item => {
-                  return <StyledItem width={'inherit'} height={'3rem'} color={'#84ffff'} key={item} />;
+                  return (
+                    <StyledItem height={'3rem'} key={item.num} color={item.color}>
+                      {item.num + 1}
+                    </StyledItem>
+                  );
                 })}
               </PoseGroup>
             </ListContainer>
@@ -183,11 +213,13 @@ class App extends Component {
             </div>
           </React.Fragment>
         )}
-        <StyledContainer pose={this.state.isVisible ? 'visible' : 'hidden'}>
-          {[...Array(12)].map((e, i) => (
-            <StyledBox width={'10rem'} height={'10rem'} color={'#536dfe'} key={`box${i + 1}`} />
-          ))}
-        </StyledContainer>
+        {this.state.animateChildren && (
+          <StyledContainer pose={this.state.isVisible ? 'visible' : 'hidden'}>
+            {[...Array(12)].map((e, i) => (
+              <StyledBox width={'10rem'} height={'10rem'} color={'#536dfe'} key={`box${i + 1}`} />
+            ))}
+          </StyledContainer>
+        )}
       </PageWrapper>
     );
   }
